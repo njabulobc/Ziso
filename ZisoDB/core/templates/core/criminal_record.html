@@ -1,0 +1,58 @@
+<!-- employee.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Form</title>
+    <!-- Include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Employee Form</h1>
+    <form id="criminal-record-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Your form fields go here -->
+        <!-- Example: -->
+        {{ form.as_p }}
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <!-- Display success or error messages here -->
+    <div id="form-messages"></div>
+
+    <!-- JavaScript for handling form submission -->
+    <!-- JavaScript for handling form submission -->
+<script>
+    $(function() {
+        $('#criminal_record_form').submit(function(event) {
+            // Prevent the form from submitting the traditional way
+            event.preventDefault();
+
+            // Serialize form data
+            var formData = new FormData($(this)[0]);
+
+            // Submit form data using AJAX
+            $.ajax({
+                type: 'POST',
+                //url to point to the view
+                url: '{% url "criminal_record" %}', // Adjust the URL as per your URL configuration
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    // Display success message
+                    $('#form-messages').text('Form submitted successfully.');
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    // Display error message
+                    $('#form-messages').text('Error: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
