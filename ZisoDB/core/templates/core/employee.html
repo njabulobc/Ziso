@@ -1,52 +1,118 @@
-<!-- employee_form.html -->
-
+<!-- employee.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Form</title>
+    <!-- Include jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+    <h1>Employee Form</h1>
+    <form id="employee-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Your form fields go here -->
+        <!-- Example: -->
+        <label for="employee_id">Employee ID:</label><br>
+        <input type="text" id="employee_id" name="employee_id"><br>
 
-<h2>Employee Form</h2>
+        <label for="first_name">First Name:</label><br>
+        <input type="text" id="first_name" name="first_name"><br>
 
-<form id="employee-form" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+        <label for="last_name">Last Name:</label><br>
+        <input type="text" id="last_name" name="last_name"><br>
 
-<div id="form-errors" style="color: red;"></div>
+        <label for="address">Address:</label><br>
+        <input type="text" id="address" name="address"><br>
 
+        <label for="phone_number">Phone Number:</label><br>
+        <input type="text" id="phone_number" name="phone_number"><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br>
+
+        <label for="date_of_birth">Date of Birth:</label><br>
+        <input type="date" id="date_of_birth" name="date_of_birth"><br>
+
+        <label for="national_id">National ID:</label><br>
+        <input type="text" id="national_id" name="national_id"><br>
+
+        <label for="id_image">ID Image:</label><br>
+        <input type="file" id="id_image" name="id_image"><br>
+
+        <label for="passport_number">Passport Number:</label><br>
+        <input type="text" id="passport_number" name="passport_number"><br>
+
+        <label for="date_of_employment">Date of Employment:</label><br>
+        <input type="date" id="date_of_employment" name="date_of_employment"><br>
+
+        <label for="position">Position:</label><br>
+        <input type="text" id="position" name="position"><br>
+
+        <!-- You may need to create dropdowns or input fields for foreign keys like court_cases, criminal_record, and employment_record -->
+        <!-- Example: -->
+        <label for="court_case">Court Case:</label><br>
+        <select id="court_case" name="court_case">
+            {% for court_case in court_cases %}
+                <option value="{{ court_case.id }}">{{ court_case.name }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="criminal_record">Criminal Record:</label><br>
+        <select id="criminal_record" name="criminal_record">
+            {% for criminal_record in criminal_records %}
+                <option value="{{ criminal_record.id }}">{{ criminal_record.name }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="employment_record">Employment Record:</label><br>
+        <select id="employment_record" name="employment_record">
+            {% for employment_record in employment_records %}
+                <option value="{{ employment_record.id }}">{{ employment_record.name }}</option>
+            {% endfor %}
+        </select><br>
+
+
+        <label for="cv">CV:</label><br>
+        <input type="file" id="cv" name="cv"><br>
+
+        <label for="vehicle_registration_number">Vehicle Registration Number:</label><br>
+        <input type="text" id="vehicle_registration_number" name="vehicle_registration_number"><br>
+
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <!-- Display success or error messages here -->
+    <div id="form-messages"></div>
+
+    <!-- JavaScript for handling form submission -->
+    <!-- JavaScript for handling form submission -->
 <script>
-    $(document).ready(function() {
+    $(function() {
         $('#employee-form').submit(function(event) {
-            event.preventDefault(); // Prevent the form from submitting normally
+            // Prevent the form from submitting the traditional way
+            event.preventDefault();
 
             // Serialize form data
             var formData = new FormData($(this)[0]);
 
-            // Submit form data via AJAX
+            // Submit form data using AJAX
             $.ajax({
                 type: 'POST',
-                url: '{% url "submit_employee_form" %}',  // Use the appropriate URL pattern
+                //url to point to the view
+                url: '{% url "employee" %}', // Adjust the URL as per your URL configuration
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    if (response.success) {
-                        alert('Form submitted successfully!');
-                        // Optionally, you can reset the form after successful submission
-                        $('#employee-form')[0].reset();
-                    } else {
-                        $('#form-errors').text('Form submission failed. Please check the errors.');
-                    }
+                    // Display success message
+                    $('#form-messages').text('Form submitted successfully.');
                 },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    $('#form-errors').text('An error occurred while submitting the form.');
+                error: function(xhr, textStatus, errorThrown) {
+                    // Display error message
+                    $('#form-messages').text('Error: ' + xhr.responseText);
                 }
             });
         });

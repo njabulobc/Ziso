@@ -29,6 +29,7 @@ from .views import (
     submit_form,
 )
 
+
 urlpatterns = [
     path('employee/', EmployeeView.as_view(), name='employee'),
     path('next-of-kin/', NextOfKinView.as_view(), name='next_of_kin'),
