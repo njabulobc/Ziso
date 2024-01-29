@@ -17,7 +17,7 @@ class Employee(models.Model):
     date_of_employment = models.DateField()
     position = models.CharField(max_length=30)
 #   point to next of kin table
-    court = models.ForeignKey('Court', on_delete=models.CASCADE)
+    court_cases = models.ForeignKey('CourtCases', on_delete=models.CASCADE)
     # point to criminal record table
     criminal_record = models.ForeignKey('CriminalRecord', on_delete=models.CASCADE)
     # point to employment record table
@@ -58,7 +58,7 @@ class Company(models.Model):
     company_director = models.ForeignKey('Director', on_delete=models.CASCADE)
     company_employees = models.ForeignKey('Employee', on_delete=models.CASCADE)
     company_next_of_kin = models.ForeignKey('NextOfKin', on_delete=models.CASCADE)
-    company_court = models.ForeignKey('Court', on_delete=models.CASCADE)
+    company_court_cases = models.ForeignKey('CourtCases', on_delete=models.CASCADE)
 
 class CourtCases(models.Model):
     court_case_id = models.IntegerField(primary_key=True)

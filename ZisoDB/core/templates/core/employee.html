@@ -1,0 +1,57 @@
+<!-- employee_form.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h2>Employee Form</h2>
+
+<form id="employee-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+
+<div id="form-errors" style="color: red;"></div>
+
+<script>
+    $(document).ready(function() {
+        $('#employee-form').submit(function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // Serialize form data
+            var formData = new FormData($(this)[0]);
+
+            // Submit form data via AJAX
+            $.ajax({
+                type: 'POST',
+                url: '{% url "submit_employee_form" %}',  // Use the appropriate URL pattern
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert('Form submitted successfully!');
+                        // Optionally, you can reset the form after successful submission
+                        $('#employee-form')[0].reset();
+                    } else {
+                        $('#form-errors').text('Form submission failed. Please check the errors.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('#form-errors').text('An error occurred while submitting the form.');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

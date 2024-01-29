@@ -31,7 +31,7 @@ class CriminalRecordForm(forms.ModelForm):
         model = CriminalRecord
         fields = '__all__'  # Include all fields from the CriminalRecord model
 
-class PreviousTransactionsForm(forms.ModelForm):
+class PrevTransactionsForm(forms.ModelForm):
     class Meta:
         model = PreviousTransactions
         fields = '__all__'  # Include all fields from the PreviousTransactions model
