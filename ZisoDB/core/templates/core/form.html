@@ -14,7 +14,7 @@
                     </p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 text-indigo-100">
+            <div class="flex flex-col items-start gap-3 text-indigo-100 sm:flex-row sm:items-center">
                 {% if breadcrumbs %}
                     <nav class="flex items-center text-sm font-medium" aria-label="Breadcrumb">
                         {% for crumb in breadcrumbs %}
@@ -28,6 +28,14 @@
                             {% endif %}
                         {% endfor %}
                     </nav>
+                {% endif %}
+                {% if list_url %}
+                    <a href="{{ list_url }}" class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/20">
+                        {{ list_link_label|default:"View records" }}
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+                        </svg>
+                    </a>
                 {% endif %}
             </div>
         </div>

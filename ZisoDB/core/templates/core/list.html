@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Ziso Intelligence{% endblock %}
+
+{% block content %}
+<section class="space-y-8">
+    <div class="rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-900 to-indigo-700 px-8 py-10 text-white shadow-xl">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="space-y-3">
+                <p class="text-3xl">{{ page_config.icon }}</p>
+                <div>
+                    <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">{{ page_config.title }} records</h1>
+                    <p class="mt-3 max-w-2xl text-base text-indigo-100">
+                        Review and govern the data submitted through the {{ page_config.title|lower }} workflow.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col items-start gap-3 text-indigo-100 sm:flex-row sm:items-center">
+                {% if breadcrumbs %}
+                    <nav class="flex items-center text-sm font-medium" aria-label="Breadcrumb">
+                        {% for crumb in breadcrumbs %}
+                            {% if not forloop.first %}
+                                <span class="px-2 text-indigo-200">/</span>
+                            {% endif %}
+                            {% if crumb.url %}
+                                <a href="{{ crumb.url }}" class="transition hover:text-white">{{ crumb.label }}</a>
+                            {% else %}
+                                <span class="text-white/90">{{ crumb.label }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </nav>
+                {% endif %}
+                <a href="{{ create_url }}" class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/20">
+                    {{ create_label }}
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Records</p>
+                <p class="text-2xl font-semibold text-slate-900">{{ record_count }} total</p>
+            </div>
+            <div class="text-right text-sm text-slate-500">
+                Updated {% now "j M Y, H:i" %}
+            </div>
+        </div>
+        {% if rows %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            {% for column in columns %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                    {{ column.label }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white">
+                        {% for row in rows %}
+                            <tr class="hover:bg-indigo-50/40">
+                                {% for value in row.values %}
+                                    <td class="px-6 py-4 text-sm text-slate-700">{{ value }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="px-6 py-20 text-center text-sm text-slate-500">
+                {{ empty_message }}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,8 +1,11 @@
+import datetime
+
 from django import forms as django_forms
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import formats, timezone
 from django.views.generic import TemplateView, View
 
 from .forms import (
@@ -16,6 +19,17 @@ from .forms import (
     NextOfKinForm,
     PrevTransactionsForm,
 )
+from .models import (
+    Company,
+    CourtCases,
+    CriminalRecord,
+    Customer,
+    Director,
+    Employee,
+    EmploymentRecord,
+    NextOfKin,
+    PreviousTransactions,
+)
 
 
 FORM_METADATA = {
@@ -27,6 +41,17 @@ FORM_METADATA = {
         "cta": "Create employee record",
         "icon": "👤",
         "url_name": "employee",
+        "list_url_name": "employee_list",
+        "list_label": "Browse employee records",
+        "empty_message": "No employee profiles have been captured yet.",
+        "list_fields": [
+            ("employee_id", "Employee ID"),
+            ("first_name", "First name"),
+            ("last_name", "Last name"),
+            ("position", "Position"),
+            ("date_of_employment", "Start date"),
+        ],
+        "model": Employee,
     },
     "next_of_kin": {
         "title": "Next of Kin",
@@ -36,6 +61,16 @@ FORM_METADATA = {
         "cta": "Add next of kin record",
         "icon": "👪",
         "url_name": "next_of_kin",
+        "list_url_name": "next_of_kin_list",
+        "list_label": "View next of kin contacts",
+        "empty_message": "No next of kin contacts recorded yet.",
+        "list_fields": [
+            ("next_of_kin_id", "Reference"),
+            ("next_of_kin_relationship", "Relationship"),
+            ("next_of_kin_phone_number", "Phone"),
+            ("next_of_kin_email", "Email"),
+        ],
+        "model": NextOfKin,
     },
     "company": {
         "title": "Company Details",
@@ -45,6 +80,17 @@ FORM_METADATA = {
         "cta": "Add company record",
         "icon": "🏢",
         "url_name": "company",
+        "list_url_name": "company_list",
+        "list_label": "Review company registry",
+        "empty_message": "No companies have been registered yet.",
+        "list_fields": [
+            ("company_id", "Company ID"),
+            ("company_name", "Company"),
+            ("company_registration_number", "Registration"),
+            ("company_phone_number", "Phone"),
+            ("company_email", "Email"),
+        ],
+        "model": Company,
     },
     "director": {
         "title": "Director Profile",
@@ -54,6 +100,17 @@ FORM_METADATA = {
         "cta": "Register director",
         "icon": "🧑‍💼",
         "url_name": "director",
+        "list_url_name": "director_list",
+        "list_label": "View directors",
+        "empty_message": "No directors recorded yet.",
+        "list_fields": [
+            ("director_id", "Director ID"),
+            ("director_first_name", "First name"),
+            ("director_last_name", "Last name"),
+            ("director_phone_number", "Phone"),
+            ("director_email", "Email"),
+        ],
+        "model": Director,
     },
     "court_cases": {
         "title": "Court Case",
@@ -63,6 +120,17 @@ FORM_METADATA = {
         "cta": "Log court case",
         "icon": "⚖️",
         "url_name": "court_cases",
+        "list_url_name": "court_cases_list",
+        "list_label": "Track court cases",
+        "empty_message": "No court cases logged yet.",
+        "list_fields": [
+            ("court_case_number", "Case number"),
+            ("court_case_name", "Case name"),
+            ("court_case_type", "Type"),
+            ("court_case_date", "Date"),
+            ("court_case_location", "Location"),
+        ],
+        "model": CourtCases,
     },
     "criminal_record": {
         "title": "Criminal Record",
@@ -72,6 +140,17 @@ FORM_METADATA = {
         "cta": "Add criminal record",
         "icon": "🛡️",
         "url_name": "criminal_record",
+        "list_url_name": "criminal_record_list",
+        "list_label": "Browse criminal records",
+        "empty_message": "No criminal records have been logged yet.",
+        "list_fields": [
+            ("criminal_record_id", "Record ID"),
+            ("criminal_record_type", "Type"),
+            ("criminal_record_date", "Date"),
+            ("criminal_record_location", "Location"),
+            ("criminal_record_court_case", "Court case"),
+        ],
+        "model": CriminalRecord,
     },
     "prev_transactions": {
         "title": "Previous Transaction",
@@ -81,6 +160,17 @@ FORM_METADATA = {
         "cta": "Log transaction",
         "icon": "💳",
         "url_name": "prev_transactions",
+        "list_url_name": "prev_transactions_list",
+        "list_label": "Review past transactions",
+        "empty_message": "No historical transactions recorded yet.",
+        "list_fields": [
+            ("previous_transaction_id", "Reference"),
+            ("previous_transaction_date", "Date"),
+            ("previous_transaction_time", "Time"),
+            ("previous_transaction_amount", "Amount"),
+            ("previous_transaction_description", "Description"),
+        ],
+        "model": PreviousTransactions,
     },
     "employment_record": {
         "title": "Employment Record",
@@ -90,6 +180,17 @@ FORM_METADATA = {
         "cta": "Add employment record",
         "icon": "📁",
         "url_name": "employment_record",
+        "list_url_name": "employment_record_list",
+        "list_label": "View employment history",
+        "empty_message": "No employment records captured yet.",
+        "list_fields": [
+            ("employment_record_id", "Record ID"),
+            ("employment_record_employee", "Employee"),
+            ("employment_record_date", "Date"),
+            ("employment_record_time", "Time"),
+            ("employment_record_description", "Description"),
+        ],
+        "model": EmploymentRecord,
     },
     "customer": {
         "title": "Customer Profile",
@@ -99,8 +200,28 @@ FORM_METADATA = {
         "cta": "Create customer profile",
         "icon": "🙍",
         "url_name": "customer",
+        "list_url_name": "customer_list",
+        "list_label": "Browse customer profiles",
+        "empty_message": "No customer profiles created yet.",
+        "list_fields": [
+            ("customer_id", "Customer ID"),
+            ("customer_first_name", "First name"),
+            ("customer_last_name", "Last name"),
+            ("customer_phone_number", "Phone"),
+            ("customer_email", "Email"),
+        ],
+        "model": Customer,
     },
 }
+
+
+class MetadataMixin:
+    config_key = None
+
+    def get_page_config(self):
+        if self.config_key is None or self.config_key not in FORM_METADATA:
+            raise ValueError("View misconfigured – missing metadata key.")
+        return FORM_METADATA[self.config_key]
 
 
 class HomeView(TemplateView):
@@ -116,16 +237,20 @@ class HomeView(TemplateView):
                 "cta": config["cta"],
                 "icon": config["icon"],
                 "url": reverse(config["url_name"]),
+                "view_url": reverse(config["list_url_name"]),
+                "view_label": config.get("list_label"),
+                "record_count": config.get("model").objects.count()
+                if config.get("model")
+                else None,
             }
             for config in FORM_METADATA.values()
         ]
         return context
 
 
-class TailwindFormView(View):
+class TailwindFormView(MetadataMixin, View):
     template_name = "core/form.html"
     form_class = None
-    config_key = None
 
     def get(self, request, *args, **kwargs):
         form = self.get_form()
@@ -172,16 +297,20 @@ class TailwindFormView(View):
 
     def get_context_data(self, **kwargs):
         page_config = self.get_page_config()
-        context = {"page_config": page_config, "submit_label": page_config["submit_label"], "form_action": self.request.path}
+        context = {
+            "page_config": page_config,
+            "submit_label": page_config["submit_label"],
+            "form_action": self.request.path,
+        }
         context.update(kwargs)
         context["page_title"] = page_config["title"]
         context["breadcrumbs"] = self._build_breadcrumbs(page_config)
+        if page_config.get("list_url_name"):
+            context["list_url"] = reverse(page_config["list_url_name"])
+            context["list_link_label"] = page_config.get(
+                "list_label", f"View {page_config['title'].lower()}"
+            )
         return context
-
-    def get_page_config(self):
-        if self.config_key is None or self.config_key not in FORM_METADATA:
-            raise ValueError("Form view misconfigured – missing metadata key.")
-        return FORM_METADATA[self.config_key]
 
     def _build_breadcrumbs(self, page_config):
         return [
@@ -286,3 +415,125 @@ class EmploymentRecordView(TailwindFormView):
 class CustomerView(TailwindFormView):
     form_class = CustomerForm
     config_key = "customer"
+
+
+class RecordListView(MetadataMixin, TemplateView):
+    template_name = "core/list.html"
+    model = None
+    list_fields = None
+
+    def get_model(self):
+        if self.model is not None:
+            return self.model
+        page_config = self.get_page_config()
+        model = page_config.get("model")
+        if model is None:
+            raise ValueError("List view misconfigured – missing model metadata.")
+        return model
+
+    def get_queryset(self):
+        return self.get_model().objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_config = self.get_page_config()
+        context["page_config"] = page_config
+        context["page_title"] = f"{page_config['title']} records"
+        context["breadcrumbs"] = [
+            {"label": "Dashboard", "url": reverse("home")},
+            {"label": page_config["title"], "url": reverse(page_config["url_name"])},
+            {"label": "Records", "url": ""},
+        ]
+        context["create_url"] = reverse(page_config["url_name"])
+        context["create_label"] = page_config.get("cta", "Create record")
+        context["columns"] = self.get_columns()
+        context["rows"] = self.get_rows()
+        context["empty_message"] = page_config.get(
+            "empty_message", "No records have been captured yet."
+        )
+        context["record_count"] = len(context["rows"])
+        return context
+
+    def get_columns(self):
+        field_config = self.list_fields or self.get_page_config().get("list_fields", [])
+        columns = []
+        for field_name, label in field_config:
+            columns.append({"name": field_name, "label": label})
+        if not columns:
+            model = self.get_model()
+            for field in model._meta.fields[:5]:
+                columns.append({"name": field.name, "label": field.verbose_name.title()})
+        return columns
+
+    def get_rows(self):
+        rows = []
+        columns = self.get_columns()
+        for obj in self.get_queryset():
+            rows.append(
+                {
+                    "object": obj,
+                    "values": [self._resolve_value(obj, column["name"]) for column in columns],
+                }
+            )
+        return rows
+
+    def _resolve_value(self, obj, field_name):
+        value = getattr(obj, field_name, None)
+        if hasattr(value, "all"):
+            values = [str(item) for item in value.all()]
+            return ", ".join(values) if values else "—"
+        if isinstance(value, datetime.datetime):
+            value = timezone.localtime(value) if timezone.is_aware(value) else value
+            return formats.date_format(value, "DATETIME_FORMAT")
+        if isinstance(value, datetime.date):
+            return formats.date_format(value, "DATE_FORMAT")
+        if isinstance(value, datetime.time):
+            return formats.time_format(value, "TIME_FORMAT")
+        if value in (None, ""):
+            return "—"
+        return str(value)
+
+
+class EmployeeListView(RecordListView):
+    config_key = "employee"
+    model = Employee
+
+
+class NextOfKinListView(RecordListView):
+    config_key = "next_of_kin"
+    model = NextOfKin
+
+
+class CompanyListView(RecordListView):
+    config_key = "company"
+    model = Company
+
+
+class DirectorListView(RecordListView):
+    config_key = "director"
+    model = Director
+
+
+class CourtCasesListView(RecordListView):
+    config_key = "court_cases"
+    model = CourtCases
+
+
+class CriminalRecordListView(RecordListView):
+    config_key = "criminal_record"
+    model = CriminalRecord
+
+
+class PrevTransactionsListView(RecordListView):
+    config_key = "prev_transactions"
+    model = PreviousTransactions
+
+
+class EmploymentRecordListView(RecordListView):
+    config_key = "employment_record"
+    model = EmploymentRecord
+
+
+class CustomerListView(RecordListView):
+    config_key = "customer"
+    model = Customer
