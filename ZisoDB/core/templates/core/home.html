@@ -71,13 +71,26 @@
                         </div>
                         <h3 class="text-xl font-semibold text-slate-900">{{ page.title }}</h3>
                         <p class="text-sm leading-relaxed text-slate-600">{{ page.description }}</p>
+                        {% if page.record_count is not None %}
+                            <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">{{ page.record_count }} records</p>
+                        {% endif %}
                     </div>
-                    <a href="{{ page.url }}" class="mt-6 inline-flex items-center justify-between rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600 transition group-hover:bg-indigo-100">
-                        {{ page.cta }}
-                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
-                        </svg>
-                    </a>
+                    <div class="mt-6 flex flex-col gap-2">
+                        <a href="{{ page.url }}" class="inline-flex items-center justify-between rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600 transition group-hover:bg-indigo-100">
+                            {{ page.cta }}
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+                            </svg>
+                        </a>
+                        {% if page.view_url %}
+                            <a href="{{ page.view_url }}" class="inline-flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600">
+                                {{ page.view_label|default:"Browse records" }}
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
                 </article>
             {% endfor %}
         </div>
