@@ -1,37 +1,86 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Django Project{% endblock %}</title>
-    <!-- Add your CSS files or CDN links here -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ page_title|default:"Ziso Intelligence" }}{% endblock %}</title>
+    <meta name="description" content="Operational intelligence workspace for compliance and risk teams" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    },
+                    boxShadow: {
+                        'brand': '0 20px 45px -20px rgba(79, 70, 229, 0.4)',
+                    },
+                }
+            }
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="flex min-h-full flex-col bg-slate-100 font-sans text-slate-800">
+    <div class="flex flex-1 flex-col">
+        <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
+            <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <a href="{% url 'home' %}" class="flex items-center gap-3 text-lg font-semibold text-slate-900">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-brand">ZI</span>
+                    <span>Ziso Intelligence</span>
+                </a>
+                <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
+                    {% url 'home' as home_url %}
+                    {% url 'employee' as employee_url %}
+                    {% url 'customer' as customer_url %}
+                    {% url 'company' as company_url %}
+                    <a href="{{ home_url }}" class="transition hover:text-indigo-600 {% if request.path == home_url %}text-indigo-600{% else %}text-slate-600{% endif %}">Dashboard</a>
+                    <a href="{{ employee_url }}" class="transition hover:text-indigo-600 {% if request.path == employee_url %}text-indigo-600{% else %}text-slate-600{% endif %}">Employees</a>
+                    <a href="{{ customer_url }}" class="transition hover:text-indigo-600 {% if request.path == customer_url %}text-indigo-600{% else %}text-slate-600{% endif %}">Customers</a>
+                    <a href="{{ company_url }}" class="transition hover:text-indigo-600 {% if request.path == company_url %}text-indigo-600{% else %}text-slate-600{% endif %}">Companies</a>
+                </nav>
+                <a href="{% url 'employee' %}" class="hidden items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600 shadow-sm transition hover:bg-indigo-100 md:inline-flex">
+                    Start a record
+                </a>
+            </div>
+        </header>
 
-<div class="container">
-    <header>
-        <h1>My Django Project</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'home' %}">Home</a></li>
-                <!-- Add other navigation links here -->
-            </ul>
-        </nav>
-    </header>
+        <main class="flex-1 py-10">
+            {% if messages %}
+                <div class="mx-auto mb-8 max-w-3xl px-4 sm:px-6 lg:px-8">
+                    <div class="space-y-3">
+                        {% for message in messages %}
+                            <div class="flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm shadow-sm {% if 'success' in message.tags %}border-emerald-200 bg-emerald-50 text-emerald-700{% elif 'error' in message.tags %}border-rose-200 bg-rose-50 text-rose-700{% elif 'warning' in message.tags %}border-amber-200 bg-amber-50 text-amber-700{% else %}border-slate-200 bg-white text-slate-700{% endif %}">
+                                <div class="mt-0.5 h-2.5 w-2.5 flex-none rounded-full bg-current"></div>
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
-    <main>
-        {% block content %}
-        <!-- Main content of each page will be inserted here -->
-        {% endblock %}
-    </main>
+            <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
 
-    <footer>
-        <!-- Footer content -->
-    </footer>
-</div>
+        <footer class="border-t border-slate-200 bg-white/80">
+            <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 py-6 text-sm text-slate-500 sm:flex-row sm:px-6 lg:px-8">
+                <p>&copy; {% now 'Y' %} Ziso Intelligence. Built for trusted investigations.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="transition hover:text-slate-700">Privacy</a>
+                    <a href="#" class="transition hover:text-slate-700">Compliance</a>
+                    <a href="#" class="transition hover:text-slate-700">Support</a>
+                </div>
+            </div>
+        </footer>
+    </div>
 
-<!-- Add your JavaScript files or CDN links here -->
-<script src="{% static/script.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>
