@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ziso
+    env: python
+    plan: free
+    buildCommand: "pip install -r ZisoDB/requirements.txt && cd ZisoDB && python manage.py collectstatic --noinput"
+    startCommand: "cd ZisoDB && python manage.py migrate --noinput && gunicorn ZisoDB.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "localhost,127.0.0.1,.onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: DATABASE_FILE
+        value: /var/data/db.sqlite3
+    disk:
+      name: ziso-data
+      mountPath: /var/data
+      sizeGB: 1
+
+PYTHON_VERSION=3.11
