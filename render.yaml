@@ -20,3 +20,5 @@ services:
       name: ziso-data
       mountPath: /var/data
       sizeGB: 1
+
+PYTHON_VERSION=3.11
